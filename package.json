@@ -1,7 +1,7 @@
 {
   "name": "Queen-AI",
   "version": "1.0.0",
-  "description": "World Best Multi Language Simple AI chat bot for whatsapp",
+  "description": "World Best Multi Language Simple AI chat bot written in JavaScript",
   "main": "Connect/module/cilent.js",
   "type": "commonjs",
   "scripts": {
@@ -18,7 +18,7 @@
   "author": "DarkWinzo",
   "license": "MIT",
   "dependencies": {
-        "@adiwajshing/baileys": "@adiwajshing/baileys": "github:WhiskeySockets/Baileys",
+        "@adiwajshing/baileys": "github:WhiskeySockets/Baileys",
         "@adiwajshing/keyed-db": "^0.2.4",
         "awesome-phonenumber": "^2.64.0",
         "aes256":"1.1.0",
@@ -59,6 +59,7 @@
         "request": "^2.88.2",
         "simple-git": "^3.17.0",
         "util": "^0.12.5",
+        "x-asena": "^1.0.1",
         "yargs": "^17.7.1"
   },
   "directories": {
