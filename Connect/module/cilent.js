@@ -15,6 +15,8 @@ const app = express();
 const port = global.PORT || 8000;
 const PhoneNumber = require('awesome-phonenumber');
 const Connection = require("../lib/Connection");
+const singleToMulti = require("../lib/session-convert/MultiAuth");
+const { MakeSession } = require("../lib/session-convert/Session");
 const { imageToWebp, videoToWebp, writeExifImg, writeExifVid } = require('../lib/exif');
 const { smsg, isUrl, generateMessageTag, getBuffer, getSizeMedia, fetchJson, await, sleep } = require('../lib/myfunc');
 //===================================================[ SESSION ID CONVORTER ]==================================================//
