@@ -1,4 +1,4 @@
-const { default: QueenConnect, useSingleFileAuthState, DisconnectReason, Browsers, fetchLatestBaileysVersion, generateForwardMessageContent, prepareWAMessageMedia, generateWAMessageFromContent, generateMessageID, downloadContentFromMessage, makeInMemoryStore, jidDecode, proto } = require("@adiwajshing/baileys")
+const { default: QueenConnect, useMultiFileAuthState, DisconnectReason, Browsers, fetchLatestBaileysVersion, generateForwardMessageContent, prepareWAMessageMedia, generateWAMessageFromContent, generateMessageID, downloadContentFromMessage, makeInMemoryStore, jidDecode, proto } = require("@adiwajshing/baileys")
 const config = require('../../config');
 const pino = require('pino');
 const fs = require('fs');
@@ -9,13 +9,27 @@ const FileType = require('file-type');
 const path = require('path');
 const _ = require('lodash');
 const axios = require('axios');
-const port = 8000
+const got = require('got');
+const express = require("express");
+const app = express();
+const port = global.PORT || 8000;
 const PhoneNumber = require('awesome-phonenumber');
 const Connection = require("../lib/Connection");
 const { imageToWebp, videoToWebp, writeExifImg, writeExifVid } = require('../lib/exif');
 const { smsg, isUrl, generateMessageTag, getBuffer, getSizeMedia, fetchJson, await, sleep } = require('../lib/myfunc');
+//===================================================[ SESSION ID CONVORTER ]==================================================//
 
 //=======================================================[ CONSOLE FONT ]=====================================================//
+say('QUEEN - AI', {
+  font: 'block',
+  align: 'center',
+  gradient: ['red', 'magenta']
+});
+say('- Coded By DarkWinzo -', {
+  font: 'pallet',
+  align: 'center',
+  gradient: ['magenta', 'red']
+});
 //========================================================================================================================//    
 var low
 try {
@@ -25,9 +39,8 @@ try {
 }
 
 const { Low, JSONFile } = low
-const mongoDB = require('../lib/mongoDB')
-
-const store = makeInMemoryStore({ logger: pino().child({ level: 'silent', stream: 'store' }) })
+const mongoDB = require('../lib/mongoDB');
+const store = makeInMemoryStore({ logger: pino().child({ level: 'silent', stream: 'store' }) });
 
 global.opts = new Object(yargs(process.argv.slice(2)).exitProcess(false).parse())
 global.db = new Low(
@@ -58,17 +71,13 @@ global.loadDatabase = async function loadDatabase() {
 }
 loadDatabase()
 
-// Auto guardado de base de datos cada 30 Segundos
 if (global.db) setInterval(async () => {
-    if (global.db.data) await global.db.write()
-  }, 30 * 1000)
+  if (global.db.data) await global.db.write()
+  }, 30 * 1000);
 
 async function startQueen() {
-      let { version, isLatest } = await fetchLatestBaileysVersion();
-       const { state, saveState } = useSingleFileAuthState(
-    "./session.Queen.json",
-    pino({ level: "silent" })
-  );  
+    let { version, isLatest } = await fetchLatestBaileysVersion();
+    const { state, saveCreds } = await useMultiFileAuthState("./Connect/auth_info_baileys/", pino({ level: "silent" }) );
     const Queen = QueenConnect({
                     logger: pino({ level: 'fatal' }),
                     auth: state,
@@ -85,9 +94,8 @@ async function startQueen() {
                     },
                     });
    
-            store.bind(Queen.ev)
-//=======================================================[ AUTO BIO ]=====================================================//            
-//========================================================================================================================//    
+            store.bind(Queen.ev);
+    
     Queen.ev.on('messages.upsert', async chatUpdate => {
         try {
         mek = chatUpdate.messages[0]
@@ -104,6 +112,18 @@ async function startQueen() {
     });
     Queen.ev.on("connection.update", async (update) => { Connection(Queen, update, startQueen);});
 
+
+//=======================================================[ AUTO BIO ]=====================================================//            
+        setInterval(async () => {
+
+        var utch = new Date().toLocaleDateString("EN", { weekday: "long", year: "numeric", month: "long", day: "numeric", });
+
+        var ov_time = new Date().toLocaleString("LK", { timeZone: "Asia/Colombo" }).split(" ")[1];
+
+        const biography = "📅𝗗𝙰𝚃𝙴: " + utch + "\n⌚𝗧𝙸𝙼𝙴: " + ov_time + "\n\n💗 𝗣𝙾𝚆𝙴𝚁𝙴𝙳 𝗕𝚈 𝗤𝚄𝙴𝙴𝙽-𝗔𝙸...💬\n\n👨🏼‍💻 𝗖𝚁𝙴𝙰𝚃𝙴𝙳 𝗕𝚈 : "+ global.ownername;
+        await Queen.updateProfileStatus(biography);
+        }, 1000 * 10);    
+//========================================================================================================================//
     Queen.decodeJid = (jid) => {
         if (!jid) return jid
         if (/:\d+@/gi.test(jid)) {
@@ -140,7 +160,7 @@ async function startQueen() {
     Queen.public = true
     
     Queen.serializeM = (m) => smsg(Queen, m, store);
-    Queen.ev.on('creds.update', saveState);
+    Queen.ev.on('creds.update', saveCreds);
       
       /** 
             * Cambiar el tamaño de la imagen
@@ -575,16 +595,22 @@ async function startQueen() {
 
     }
 
-    return Queen
+  return Queen
 }
 
-startQueen()
+app.get("/", (req, res) => {
+  res.send("");
+ });
+app.listen(port, () => console.log(`📟 QUEEN-AI SYSTEM SERVER LISTENING PORT = http://localhost:${port} 📟`));
+setTimeout(() => {
+startQueen();
+ }, 3000)
 
 
 let file = require.resolve(__filename)
 fs.watchFile(file, () => {
 	fs.unwatchFile(file)
-	console.log(chalk.redBright("Update - 'index.js'"))
+	console.log(chalk.redBright("✅️ Update Base.js'"))
 	delete require.cache[file]
 	require(file)
-})
+});
