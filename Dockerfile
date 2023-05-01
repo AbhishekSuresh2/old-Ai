@@ -1,4 +1,4 @@
-FROM node:latest
+FROM quay.io/darkwinzo/queen-ai:beta
 ENV TZ=Asia/Kolkata
 WORKDIR /root/Queen-AI/
 COPY package*.json ./
